@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { DatabaseState } from '../types';
 import { calculateDistance } from '../utils/calculations';
+import { MATCH_RADIUS_KM } from '../utils/constants';
 
 export const useFarmData = (state: DatabaseState, activeUserId: string) => {
   return useMemo(() => {
@@ -27,7 +28,7 @@ export const useFarmData = (state: DatabaseState, activeUserId: string) => {
           (s === "Vegetables" && iso.category === "Veggie")
         );
         const dist = calculateDistance(farm.location[0], farm.location[1], iso.location[0], iso.location[1]);
-        return isCategoryMatch && dist < 20; 
+        return isCategoryMatch && dist < MATCH_RADIUS_KM; 
       }) : [];
 
     return {

@@ -6,6 +6,8 @@ interface DatabaseContextType {
   state: DatabaseState;
   setState: React.Dispatch<React.SetStateAction<DatabaseState>>;
   updateState: (updates: Partial<DatabaseState>) => void;
+  activeUserId: string;
+  setActiveUserId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const DatabaseContext = createContext<DatabaseContextType | undefined>(undefined);
@@ -21,6 +23,10 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   });
 
+  const [activeUserId, setActiveUserId] = useState<string>(() => {
+     return state.users[0]?.id || "";
+  });
+
   useEffect(() => {
     try {
       localStorage.setItem('pocketFarmerState', JSON.stringify(state));
@@ -34,7 +40,7 @@ export const DatabaseProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   return (
-    <DatabaseContext.Provider value={{ state, setState, updateState }}>
+    <DatabaseContext.Provider value={{ state, setState, updateState, activeUserId, setActiveUserId }}>
       {children}
     </DatabaseContext.Provider>
   );

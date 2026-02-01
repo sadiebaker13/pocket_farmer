@@ -3,6 +3,8 @@ export type JobType = 'Full-Time' | 'Part-Time' | 'Gig' | 'Odd Job';
 export type ListingStatus = 'Active' | 'Sold' | 'Barter Only';
 export type ListingType = 'Fruit' | 'Veggie' | 'Meat' | 'Dairy' | 'Egg' | 'Grain' | 'Sweetener' | 'Textile' | 'Raw Material' | 'Other';
 export type Season = 'Spring' | 'Summer' | 'Fall' | 'Winter' | 'Year-Round';
+export type SubscriptionTier = 'Free' | 'Pro';
+export type ProductCategory = 'Seeds' | 'Equipment' | 'Inputs' | 'Tools';
 
 export interface UserName {
   first: string;
@@ -28,6 +30,8 @@ export interface User {
   insurance?: UserInsurance;
   satisfaction_score?: number; 
   preferences?: string;
+  subscriptionTier?: SubscriptionTier;
+  subscriptionExpiry?: string;
 }
 
 // FarmID
@@ -62,6 +66,24 @@ export interface JobPost {
   compensation: string; 
 }
 
+export interface JobApplication {
+  id: string;
+  job_id: string;
+  applicant_id: string;
+  status: 'Applied' | 'Reviewed' | 'Accepted' | 'Rejected';
+  applied_at: string;
+}
+
+export interface ServiceRequest {
+  id: string;
+  farm_id: string;
+  service_type: 'Veterinary' | 'Pesticide' | 'Herbicide' | 'Maintenance' | 'Other';
+  description: string;
+  status: 'Open' | 'Fulfilled';
+  urgency: 'Low' | 'Medium' | 'High';
+  posted_at: string;
+}
+
 export interface ISORequest {
   id: string;
   customer_id: string;
@@ -87,6 +109,17 @@ export interface ServiceListing {
   verified?: boolean; 
 }
 
+export interface AffiliateProduct {
+  id: string;
+  name: string;
+  category: ProductCategory;
+  description: string;
+  price: number;
+  image_url: string;
+  affiliate_link: string;
+  retailer: string;
+}
+
 // Relationships (Edges)
 
 export interface WorksAt {
@@ -109,8 +142,11 @@ export interface DatabaseState {
   farms: Farm[];
   listings: Listing[];
   jobPosts: JobPost[];
+  jobApplications: JobApplication[];
+  serviceRequests: ServiceRequest[];
   isoRequests: ISORequest[]; 
   services: ServiceListing[]; 
+  products: AffiliateProduct[];
   worksAt: WorksAt[];
   exchangeOffers: ExchangeOffer[];
 }

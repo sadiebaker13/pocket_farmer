@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Briefcase, Database, Wand2, MessageSquare,
-  ShoppingBasket, Stethoscope, UserCircle, Sprout
+  ShoppingBasket, Stethoscope, UserCircle, Sprout, Store, FileText
 } from 'lucide-react';
 
 // Component Imports
@@ -13,6 +13,8 @@ import { ServicesDirectory } from './components/ServicesDirectory';
 import { EntityManager } from './components/EntityManager';
 import { AiGenerator } from './components/AiGenerator';
 import { FarmAssistant } from './components/FarmAssistant';
+import { SuppliesShop } from './components/SuppliesShop';
+import { ProviderLeads } from './components/ProviderLeads';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -20,6 +22,8 @@ export const App: React.FC = () => {
   const NavItem = ({ id, icon: Icon, label }: any) => (
     <button
       onClick={() => setActiveTab(id)}
+      aria-label={label}
+      aria-current={activeTab === id ? 'page' : undefined}
       className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors ${
         activeTab === id 
           ? 'bg-emerald-600 text-white shadow-md' 
@@ -44,9 +48,11 @@ export const App: React.FC = () => {
               <span className="text-xl font-bold text-stone-800 tracking-tight">Pocket Farmer</span>
             </div>
             
-            <nav className="hidden md:flex space-x-1">
+            <nav className="hidden md:flex space-x-1" role="navigation">
               <NavItem id="profile" icon={UserCircle} label="My Farm" />
               <NavItem id="market" icon={ShoppingBasket} label="Market" />
+              <NavItem id="supplies" icon={Store} label="Supplies" />
+              <NavItem id="leads" icon={FileText} label="Leads" />
               <NavItem id="iso" icon={MessageSquare} label="ISO Board" />
               <NavItem id="jobs" icon={Briefcase} label="Jobs" />
               <NavItem id="services" icon={Stethoscope} label="Services" />
@@ -55,6 +61,7 @@ export const App: React.FC = () => {
             <div className="flex items-center space-x-3">
               <button 
                 onClick={() => setActiveTab('generator')}
+                aria-label="AI Generator"
                 className={`hidden md:flex items-center text-xs font-bold px-3 py-1.5 rounded-full border transition-all ${
                     activeTab === 'generator' ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'text-emerald-700 bg-emerald-50 border-emerald-100 hover:bg-emerald-100'
                 }`}
@@ -63,6 +70,7 @@ export const App: React.FC = () => {
               </button>
               <button 
                 onClick={() => setActiveTab('data')}
+                aria-label="Database Manager"
                 className={`p-2 rounded-lg transition-colors ${activeTab === 'data' ? 'text-emerald-600 bg-emerald-50' : 'text-stone-400 hover:text-stone-600 hover:bg-stone-100'}`}
                 title="Database Manager"
               >
@@ -74,9 +82,11 @@ export const App: React.FC = () => {
         
         {/* Mobile Nav */}
         <div className="md:hidden border-t border-stone-100 overflow-x-auto bg-white">
-           <div className="flex p-2 space-x-2 min-w-max">
+           <div className="flex p-2 space-x-2 min-w-max" role="navigation">
               <NavItem id="profile" icon={UserCircle} label="My Farm" />
               <NavItem id="market" icon={ShoppingBasket} label="Market" />
+              <NavItem id="supplies" icon={Store} label="Supplies" />
+              <NavItem id="leads" icon={FileText} label="Leads" />
               <NavItem id="iso" icon={MessageSquare} label="ISO" />
               <NavItem id="jobs" icon={Briefcase} label="Jobs" />
               <NavItem id="services" icon={Stethoscope} label="Services" />
@@ -90,6 +100,8 @@ export const App: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'profile' && <ProfileManager />}
         {activeTab === 'market' && <Marketplace onNavigate={setActiveTab} />}
+        {activeTab === 'supplies' && <SuppliesShop />}
+        {activeTab === 'leads' && <ProviderLeads />}
         {activeTab === 'iso' && <IsoBoard />}
         {activeTab === 'jobs' && <JobBoard />}
         {activeTab === 'services' && <ServicesDirectory />}

@@ -54,28 +54,84 @@ export const EntityManager: React.FC = () => {
   };
 
   const handleSurrealExport = () => {
-    let script = `-- Pocket Farmer SurrealDB Graph Export\n-- Generated: ${new Date().toISOString()}\n\n`;
+    const date = new Date().toISOString();
+    let script = `-- Pocket Farmer SurrealQL Export (Schema + Data)\n-- Generated: ${date}\n\n`;
+
+    // 1. Schema Definitions
+    script += "-- 1. SCHEMA DEFINITION\n";
     script += "BEGIN TRANSACTION;\n\n";
-    script += "-- 1. Define Nodes (Entities)\n";
+
+    // User Table
+    script += "-- Table: user\n";
+    script += "DEFINE TABLE user SCHEMAFULL;\n";
+    script += "DEFINE FIELD name ON TABLE user TYPE object;\n";
+    script += "DEFINE FIELD name.first ON TABLE user TYPE string;\n";
+    script += "DEFINE FIELD name.last ON TABLE user TYPE string;\n";
+    script += "DEFINE FIELD email ON TABLE user TYPE string ASSERT string::is::email($value);\n";
+    script += "DEFINE FIELD role ON TABLE user TYPE string;\n";
+    script += "DEFINE FIELD subscriptionTier ON TABLE user TYPE string;\n";
+    script += "DEFINE FIELD insurance ON TABLE user TYPE option<object>;\n";
+    script += "DEFINE FIELD photo_url ON TABLE user TYPE option<string>;\n";
+
+    // Farm Table
+    script += "\n-- Table: farm\n";
+    script += "DEFINE TABLE farm SCHEMAFULL;\n";
+    script += "DEFINE FIELD name ON TABLE farm TYPE string;\n";
+    script += "DEFINE FIELD location ON TABLE farm TYPE array;\n";
+    script += "DEFINE FIELD specialties ON TABLE farm TYPE array;\n";
+    script += "DEFINE FIELD logo_url ON TABLE farm TYPE option<string>;\n";
+
+    // Listing Table
+    script += "\n-- Table: listing\n";
+    script += "DEFINE TABLE listing SCHEMAFULL;\n";
+    script += "DEFINE FIELD name ON TABLE listing TYPE string;\n";
+    script += "DEFINE FIELD type ON TABLE listing TYPE string;\n";
+    script += "DEFINE FIELD price ON TABLE listing TYPE string;\n";
+    script += "DEFINE FIELD inventory ON TABLE listing TYPE number;\n";
+    script += "DEFINE FIELD season ON TABLE listing TYPE string;\n";
+    script += "DEFINE FIELD farm_id ON TABLE listing TYPE record(farm);\n";
+
+    // Job Post Table
+    script += "\n-- Table: job_post\n";
+    script += "DEFINE TABLE job_post SCHEMAFULL;\n";
+    script += "DEFINE FIELD title ON TABLE job_post TYPE string;\n";
+    script += "DEFINE FIELD description ON TABLE job_post TYPE string;\n";
+    script += "DEFINE FIELD type ON TABLE job_post TYPE string;\n";
+    script += "DEFINE FIELD compensation ON TABLE job_post TYPE string;\n";
+    script += "DEFINE FIELD farm_id ON TABLE job_post TYPE record(farm);\n";
+
+    script += "\nCOMMIT TRANSACTION;\n\n";
+
+    // 2. Data Creation
+    script += "-- 2. DATA IMPORT\n";
+    script += "BEGIN TRANSACTION;\n\n";
 
     // Nodes
-    state.users.forEach(u => script += `CREATE ${u.id} CONTENT ${JSON.stringify(u)};\n`);
-    state.farms.forEach(f => script += `CREATE ${f.id} CONTENT ${JSON.stringify(f)};\n`);
-    state.listings.forEach(l => script += `CREATE ${l.id} CONTENT ${JSON.stringify(l)};\n`);
-    state.services.forEach(s => script += `CREATE ${s.id} CONTENT ${JSON.stringify(s)};\n`);
-    state.isoRequests.forEach(i => script += `CREATE ${i.id} CONTENT ${JSON.stringify(i)};\n`);
+    const entities = [
+      ...state.users,
+      ...state.farms,
+      ...state.listings,
+      ...state.jobPosts,
+      ...state.serviceRequests,
+      ...state.isoRequests,
+      ...state.services,
+      ...state.products
+    ];
 
-    script += "\n-- 2. Define Edges (Connections)\n";
-    
-    // Edges: WorksAt
+    entities.forEach(item => {
+        // Simple sanitization for SQL string if needed, but JSON.stringify usually handles it
+        script += `CREATE ${item.id} CONTENT ${JSON.stringify(item)};\n`;
+    });
+
+    script += "\n-- 3. EDGES\n";
+    // Edges
     state.worksAt.forEach(rel => {
-      // In Surreal: RELATE in->works_at->out
       const content = { role: rel.role, started_at: rel.started_at };
       script += `RELATE ${rel.in}->works_at->${rel.out} CONTENT ${JSON.stringify(content)};\n`;
     });
 
     script += "\nCOMMIT TRANSACTION;";
-    downloadFile(script, `pocket_farmer_graph_${new Date().toISOString().split('T')[0]}.surql`);
+    downloadFile(script, `pocket_farmer_export_${date.split('T')[0]}.surql`);
   };
 
   const downloadFile = (content: string, filename: string) => {
@@ -112,10 +168,10 @@ export const EntityManager: React.FC = () => {
              </button>
           </div>
           <button onClick={handleJsonExport} className="bg-white border border-stone-200 text-stone-700 hover:bg-stone-50 px-3 py-2 rounded-lg text-xs font-bold flex items-center shadow-sm">
-            <FileJson size={14} className="mr-2" /> JSON
+            <FileJson size={14} className="mr-2" /> JSON Dump
           </button>
           <button onClick={handleSurrealExport} className="bg-stone-800 hover:bg-stone-900 text-white px-3 py-2 rounded-lg text-xs font-bold flex items-center shadow-sm">
-            <FileCode size={14} className="mr-2" /> SurrealQL
+            <FileCode size={14} className="mr-2" /> Export Schema+Data
           </button>
         </div>
       </div>

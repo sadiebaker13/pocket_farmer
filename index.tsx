@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { App } from './App';
 import { DatabaseProvider } from './context/DatabaseContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -11,8 +12,10 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
-    <DatabaseProvider>
-      <App />
-    </DatabaseProvider>
+    <ErrorBoundary>
+      <DatabaseProvider>
+        <App />
+      </DatabaseProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );

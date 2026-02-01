@@ -4,12 +4,13 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell 
 } from 'recharts';
 import { Listing } from '../types';
+import { CHART_COLORS } from '../utils/constants';
 
 interface FarmAnalyticsProps {
   listings: Listing[];
 }
 
-export const FarmAnalytics: React.FC<FarmAnalyticsProps> = ({ listings }) => {
+export const FarmAnalytics = React.memo<FarmAnalyticsProps>(({ listings }) => {
   // Prep Pie Data (Listings by Type)
   const typeData = listings.reduce((acc, curr) => {
     const found = acc.find(i => i.name === curr.type);
@@ -23,8 +24,6 @@ export const FarmAnalytics: React.FC<FarmAnalyticsProps> = ({ listings }) => {
     .map(l => ({ name: l.name.length > 10 ? l.name.substring(0, 10) + '...' : l.name, value: l.inventory }))
     .sort((a, b) => b.value - a.value)
     .slice(0, 5);
-
-  const COLORS = ['#059669', '#10b981', '#34d399', '#6ee7b7', '#a7f3d0', '#d1fae5'];
 
   if (listings.length === 0) return null;
 
@@ -48,7 +47,7 @@ export const FarmAnalytics: React.FC<FarmAnalyticsProps> = ({ listings }) => {
                  dataKey="value"
                >
                  {typeData.map((entry, index) => (
-                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                   <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                  ))}
                </Pie>
                <Tooltip />
@@ -77,4 +76,4 @@ export const FarmAnalytics: React.FC<FarmAnalyticsProps> = ({ listings }) => {
        </div>
     </div>
   );
-};
+});

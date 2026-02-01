@@ -1,6 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { DatabaseState, ISORequest } from "../types";
 
+// In a real production environment, this should be in process.env.API_KEY
+// For this demo, we are using the provided key.
+const API_KEY = "AIzaSyCm81IEmx-SN-LmUL41oiaXapAf0U3CK8s";
+
 const SYSTEM_INSTRUCTION = `
 You are the "Pocket Farmer" Ops generator.
 Generate realistic agricultural graph data.
@@ -13,14 +17,10 @@ Generate realistic agricultural graph data.
 `;
 
 export const generateSeedData = async (prompt: string): Promise<Partial<DatabaseState>> => {
-  if (!process.env.API_KEY) {
-    throw new Error("API Key is missing");
-  }
-
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+    model: "gemini-2.5-flash",
     contents: `Generate a Pocket Farmer dataset for: ${prompt}`,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
@@ -154,14 +154,10 @@ export const generateSeedData = async (prompt: string): Promise<Partial<Database
 };
 
 export const parseIsoRequest = async (userInput: string): Promise<Partial<ISORequest>> => {
-    if (!process.env.API_KEY) {
-      throw new Error("API Key is missing");
-    }
-  
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
   
     const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+      model: "gemini-2.5-flash",
       contents: `Extract ISO details from: "${userInput}"`,
       config: {
         systemInstruction: "Extract product name, quantity, category, trade preference, and urgency. Return JSON.",
@@ -191,11 +187,7 @@ export const chatWithAssistant = async (
   message: string,
   history: { role: 'user' | 'model'; text: string }[]
 ): Promise<string> => {
-  if (!process.env.API_KEY) {
-    throw new Error("API Key is missing");
-  }
-
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: API_KEY });
 
   // Convert simple history to API compatible content
   const formattedHistory = history.map(h => ({
@@ -204,7 +196,7 @@ export const chatWithAssistant = async (
   }));
 
   const chat = ai.chats.create({
-    model: "gemini-3-flash-preview",
+    model: "gemini-2.5-flash",
     config: {
       systemInstruction: "You are 'Pocket', an expert agricultural assistant for the Pocket Farmer app. Your users are often farmers with low digital literacy. Provide simple, actionable advice on cultivation, pest control, weather interpretation, and market trends. Be concise, friendly, and practical. Avoid complex jargon.",
     },
